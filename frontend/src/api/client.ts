@@ -43,7 +43,8 @@ export function createWebSocket(
 ): WebSocket {
   // Connect directly to Railway URL for WebSocket
   // Netlify cannot proxy WebSocket connections
-  const wsBase = (import.meta.env.VITE_API_URL || 'ws://localhost:8000')
+  const apiBase = import.meta.env.VITE_API_URL || 'https://news-analyser-production.up.railway.app'
+  const wsBase = apiBase
     .replace('https://', 'wss://')
     .replace('http://', 'ws://')
   

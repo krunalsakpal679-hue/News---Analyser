@@ -79,7 +79,7 @@ export const DropZone: React.FC = () => {
             navigate(`/processing/${response.job_id}`);
         } catch (err: any) {
             if (err.code === 'ERR_NETWORK') {
-                setError('Backend server is unreachable. Ensure the system is running with "make dev".');
+                setError('Backend server is unreachable. Please check your internet connection or the server status.');
             } else if (err.response?.data?.detail) {
                 const detail = err.response.data.detail;
                 if (typeof detail === 'object' && detail.errors) {
