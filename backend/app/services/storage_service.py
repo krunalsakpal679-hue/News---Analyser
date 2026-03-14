@@ -79,7 +79,7 @@ class StorageService:
         try:
             if self.use_cloudinary:
                 import httpx
-                url = cloudinary.utils.cloudinary_url(storage_key, resource_type='raw')[0]
+                url = cloudinary.utils.cloudinary_url(storage_key, resource_type='raw', sign_url=True)[0]
                 async with httpx.AsyncClient() as client:
                     resp = await client.get(url)
                     resp.raise_for_status()

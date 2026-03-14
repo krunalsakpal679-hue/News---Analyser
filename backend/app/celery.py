@@ -31,9 +31,18 @@ async def update_progress(job_id, event_name: str, progress: int, extra: dict = 
     if extra:
         payload.update(extra)
     try:
+        # Ensure we don't send non-serializable data (like datetimes)
+        import json
+        json.dumps(payload)
         await redis_service.publish_progress(job_id_str, payload)
     except Exception as e:
         logger.warning(f"Failed to publish progress for {job_id_str}: {str(e)}")
+        # If it failed due to serialization, try a safer subset
+        try:
+            safe_payload = {"event": event_name, "progress": progress, "job_id": job_id_str}
+            await redis_service.publish_progress(job_id_str, safe_payload)
+        except:
+            pass
 
 @celery_app.task(name="run_full_pipeline", bind=True, max_retries=3, acks_late=True)
 def run_full_pipeline(self, job_id):
@@ -127,7 +136,7 @@ async def _run_pipeline_orchestrator(self, job_id):
             
             dashboard = await job_service.get_dashboard(session, job.id)
             await update_progress(actual_uuid, 'complete', 100, {
-                'results': dashboard.model_dump() if dashboard else None
+                'results': dashboard.model_dump(mode='json') if dashboard else None
             })
             
             logger.info(f"Pipeline finished for job {actual_uuid}")

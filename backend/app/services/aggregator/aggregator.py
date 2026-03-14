@@ -27,6 +27,11 @@ class ScoreAggregator:
         # Neutral only comes from VADER as BERT is binary
         neu_raw = (vader.neutral * vader_w * 100.0)
         
+        # Dampen neutrality if we have a very strong compound score
+        # This makes the results look more representative of the primary emotion in charts
+        if abs(combined_compound) > 0.4:
+            neu_raw *= 0.6  # Reduce neutrality weight by 40% for strong sentiment
+        
         # 4. Normalize to exactly 100.0
         total = pos_raw + neg_raw + neu_raw
         if total > 0:
