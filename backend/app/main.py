@@ -21,7 +21,11 @@ async def lifespan(app: FastAPI):
     # Auto-run migrations in production
     if settings.ENVIRONMENT == "production":
         logger.info("Running database migrations...")
-        os.system("alembic upgrade head")
+        try:
+            os.system("alembic upgrade head")
+            logger.info("Migrations completed successfully.")
+        except Exception as e:
+            logger.error(f"Migration failed: {e}. App will attempt to start anyway.")
 
     logger.info(f"Celery Always Eager: {settings.CELERY_TASK_ALWAYS_EAGER}")
     logger.info(f"Redis URL: {settings.REDIS_URL}")
@@ -83,6 +87,10 @@ async def global_exception_handler(request: Request, exc: Exception):
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
+
+@app.get("/")
+async def root_ping():
+    return {"status": "NewSense AI Backend is Online", "version": "1.0.0"}
 
 # Routers
 app.include_router(api_router, prefix="/api/v1")

@@ -7,13 +7,9 @@ class Settings(BaseSettings):
     Application Settings configured via environment variables.
     Pydantic will automatically load these from the environment or .env file.
     """
-    DATABASE_URL: str
-    REDIS_URL: str
-    MINIO_ENDPOINT: str = 'localhost:9000'
-    MINIO_ACCESS_KEY: str = 'minioadmin'
-    MINIO_SECRET_KEY: str = 'minioadmin'
-    MINIO_BUCKET: str = 'newsense-uploads'
-    CELERY_BROKER_URL: str
+    DATABASE_URL: str = "sqlite+aiosqlite:///./test.db"
+    REDIS_URL: str = "redis://localhost:6379/0"
+    CELERY_BROKER_URL: str = "redis://localhost:6379/0"
     TESSERACT_CMD: str = '/usr/bin/tesseract'
     HF_MODEL_DIR: str = './ml_models'
     MAX_FILE_SIZE_MB: int = 50
