@@ -16,8 +16,10 @@ WORKDIR /app
 # Copy requirements first for Docker layer caching
 COPY backend/requirements.txt .
 
-# Install CPU-only PyTorch FIRST (before other packages)
-# This avoids downloading the 2GB GPU version
+# Upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
+
+# Install CPU-only PyTorch FIRST
 RUN pip install --no-cache-dir \
     torch==2.2.0+cpu \
     --index-url https://download.pytorch.org/whl/cpu
@@ -25,8 +27,8 @@ RUN pip install --no-cache-dir \
 # Install all other requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download spaCy English model
-RUN python -m spacy download en_core_web_sm
+# Download spaCy English model using direct link to avoid 404 issues
+RUN pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
 
 # Pre-download DistilBERT model during build
 # This prevents 30-second cold start on first request
