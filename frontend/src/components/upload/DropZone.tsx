@@ -78,19 +78,26 @@ export const DropZone: React.FC = () => {
             setJobId(response.job_id);
             navigate(`/processing/${response.job_id}`);
         } catch (err: any) {
+            console.error('Upload error details:', err);
+            
             if (err.code === 'ERR_NETWORK') {
                 setError('Backend server is unreachable. Please check your internet connection or the server status.');
-            } else if (err.response?.data?.detail) {
-                const detail = err.response.data.detail;
-                if (typeof detail === 'object' && detail.errors) {
-                    setError(detail.errors.join(', '));
-                } else if (typeof detail === 'string') {
-                    setError(detail);
+            } else if (err.response?.data) {
+                const data = err.response.data;
+                if (data.detail) {
+                    const detail = data.detail;
+                    if (typeof detail === 'object' && detail.errors) {
+                        setError(detail.errors.join(', '));
+                    } else {
+                        setError(String(detail));
+                    }
+                } else if (data.error) {
+                    setError(`${data.type || 'Error'}: ${data.error}`);
                 } else {
-                    setError('An unknown error occurred during upload.');
+                    setError(`Server error (${err.response.status}). Please try again.`);
                 }
             } else {
-                setError('Upload failed. Please check your connection or server status.');
+                setError(err.message || 'Upload failed. Please check your connection.');
             }
         } finally {
             setIsUploading(false);
