@@ -85,11 +85,12 @@ export const ResultsPage: React.FC = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    // Improve the loading condition: If results exist but status is not complete, 
-    // keep showing the loader to prevent the "Uncertain News" flicker.
-    const isProcessing = results && results.status !== 'complete' && results.status !== 'failed';
-    
-    if (loading || !results || (isProcessing && !results.verdict)) {
+    // Unified loading and processing condition
+    const isActuallyProcessing = !results || 
+        ['queued', 'extracting', 'cleaning', 'analyzing'].includes(results.status) ||
+        (results.status === 'complete' && !results.verdict);
+
+    if (loading || isActuallyProcessing) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="flex flex-col items-center gap-6">
@@ -99,10 +100,10 @@ export const ResultsPage: React.FC = () => {
                     </div>
                     <div className="text-center">
                         <p className="font-black text-slate-800 uppercase tracking-widest text-sm mb-1">
-                            {isProcessing ? 'Finalizing Analysis' : 'Processing Analysis'}
+                            {results?.status ? `Executing: ${results.status}` : 'Initializing Analysis'}
                         </p>
                         <p className="text-xs text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
-                            {isProcessing ? 'Generating Verdict & Charts...' : 'Applying Neural Preprocessing...'}
+                            Applying Neural Preprocessing...
                         </p>
                     </div>
                 </div>
