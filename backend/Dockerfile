@@ -1,16 +1,10 @@
 FROM python:3.11-slim
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-eng \
     libmagic1 \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
     poppler-utils \
     wget \
     curl \
@@ -20,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy requirements first for Docker layer caching
-COPY requirements.txt .
+COPY backend/requirements.txt .
 
 # Install CPU-only PyTorch FIRST (before other packages)
 # This avoids downloading the 2GB GPU version
@@ -44,9 +38,9 @@ AutoModelForSequenceClassification.from_pretrained(model_name); \
 print('DistilBERT model downloaded successfully')"
 
 # Copy application code
-COPY app/ ./app/
-COPY alembic/ ./alembic/
-COPY alembic.ini .
+COPY backend/app/ ./app/
+COPY backend/alembic/ ./alembic/
+COPY backend/alembic.ini .
 
 # Expose port (Railway sets $PORT dynamically)
 EXPOSE 8000
