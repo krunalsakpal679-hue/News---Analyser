@@ -85,7 +85,11 @@ export const ResultsPage: React.FC = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    if (loading || !results) {
+    // Improve the loading condition: If results exist but status is not complete, 
+    // keep showing the loader to prevent the "Uncertain News" flicker.
+    const isProcessing = results && results.status !== 'complete' && results.status !== 'failed';
+    
+    if (loading || !results || (isProcessing && !results.verdict)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="flex flex-col items-center gap-6">
@@ -94,8 +98,12 @@ export const ResultsPage: React.FC = () => {
                         <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-indigo-400" />
                     </div>
                     <div className="text-center">
-                        <p className="font-black text-slate-800 uppercase tracking-widest text-sm mb-1">Processing Analysis</p>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Applying Neural Preprocessing...</p>
+                        <p className="font-black text-slate-800 uppercase tracking-widest text-sm mb-1">
+                            {isProcessing ? 'Finalizing Analysis' : 'Processing Analysis'}
+                        </p>
+                        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
+                            {isProcessing ? 'Generating Verdict & Charts...' : 'Applying Neural Preprocessing...'}
+                        </p>
                     </div>
                 </div>
             </div>

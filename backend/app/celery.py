@@ -25,24 +25,21 @@ celery_app.conf.update(
 logger = logging.getLogger(__name__)
 
 async def update_progress(job_id, event_name: str, progress: int, extra: dict = None):
+    from pydantic.json import pydantic_encoder
     from app.services.redis_service import redis_service
+    import json
+    
     job_id_str = str(job_id)
     payload = {"event": event_name, "progress": progress, "job_id": job_id_str}
     if extra:
         payload.update(extra)
+        
     try:
-        # Ensure we don't send non-serializable data (like datetimes)
-        import json
-        json.dumps(payload)
-        await redis_service.publish_progress(job_id_str, payload)
+        # Use a more robust serialization for Redis publishing
+        serialized_payload = json.dumps(payload, default=pydantic_encoder)
+        await redis_service.publish_progress(job_id_str, serialized_payload)
     except Exception as e:
         logger.warning(f"Failed to publish progress for {job_id_str}: {str(e)}")
-        # If it failed due to serialization, try a safer subset
-        try:
-            safe_payload = {"event": event_name, "progress": progress, "job_id": job_id_str}
-            await redis_service.publish_progress(job_id_str, safe_payload)
-        except:
-            pass
 
 @celery_app.task(name="run_full_pipeline", bind=True, max_retries=3, acks_late=True)
 def run_full_pipeline(self, job_id):
@@ -135,8 +132,11 @@ async def _run_pipeline_orchestrator(self, job_id):
             await job_service.update_status(session, job.id, JobStatus.complete, 100.0)
             
             dashboard = await job_service.get_dashboard(session, job.id)
+            # Use model_dump(mode='json') to be extra safe with datetimes
+            results_dict = dashboard.model_dump(mode='json') if dashboard else None
+            
             await update_progress(actual_uuid, 'complete', 100, {
-                'results': dashboard.model_dump(mode='json') if dashboard else None
+                'results': results_dict
             })
             
             logger.info(f"Pipeline finished for job {actual_uuid}")
