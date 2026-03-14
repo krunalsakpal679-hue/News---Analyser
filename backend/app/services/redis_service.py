@@ -41,24 +41,19 @@ class RedisService:
         """Subscribes to progress events for a specific job."""
         channel = f"progress:{job_id}"
         
-        try:
-            pubsub = self.redis.pubsub()
-            await pubsub.subscribe(channel)
+        pubsub = self.redis.pubsub()
+        await pubsub.subscribe(channel)
 
+        try:
+            async for message in pubsub.listen():
+                if message["type"] == "message":
+                    yield json.loads(message["data"])
+        finally:
             try:
-                async for message in pubsub.listen():
-                    if message["type"] == "message":
-                        yield json.loads(message["data"])
-            finally:
                 await pubsub.unsubscribe(channel)
                 await pubsub.close()
-        except Exception as e:
-            if settings.ENVIRONMENT == "development":
-                print(f"WARNING: Redis subscription failed for job {job_id}: {str(e)}. Real-time updates disabled.")
-                # Keep the generator alive for a bit to avoid immediate WS close if caller handles it
-                # Or just yield a specific event
-                return
-            raise
+            except:
+                pass
 
     async def set_cache(self, key: str, value: dict, ttl: int = 3600) -> bool:
         """Sets a value in the Redis cache."""
