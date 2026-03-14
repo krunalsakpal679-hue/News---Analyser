@@ -21,11 +21,11 @@ async def lifespan(app: FastAPI):
     # Auto-run migrations in production
     if settings.ENVIRONMENT == "production":
         logger.info("Running database migrations...")
-        try:
-            os.system("alembic upgrade head")
+        exit_code = os.system("alembic upgrade head")
+        if exit_code == 0:
             logger.info("Migrations completed successfully.")
-        except Exception as e:
-            logger.error(f"Migration failed: {e}. App will attempt to start anyway.")
+        else:
+            logger.warning(f"Alembic migration command failed with exit code {exit_code}. App will attempt optimistic startup.")
 
     logger.info(f"Celery Always Eager: {settings.CELERY_TASK_ALWAYS_EAGER}")
     logger.info(f"Redis URL: {settings.REDIS_URL}")
