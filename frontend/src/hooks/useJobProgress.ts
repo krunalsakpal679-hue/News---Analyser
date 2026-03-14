@@ -22,6 +22,34 @@ export const useJobProgress = (jobId: string | null) => {
     useEffect(() => {
         if (!jobId) return;
 
+        let pollingInterval: any = null;
+
+        const startPolling = () => {
+             if (pollingInterval) return;
+             console.log('Starting polling fallback...');
+             pollingInterval = setInterval(async () => {
+                 try {
+                     const { getStatus, getResults } = await import('../api/client');
+                     const data = await getStatus(jobId);
+                     const backendEvent = data.status;
+                     const progressValue = data.progress_pct || 0;
+
+                     updateProgress(backendEvent as any, progressValue);
+
+                     if (backendEvent === 'complete') {
+                         const resultsData = await getResults(jobId);
+                         setResults(resultsData);
+                         clearInterval(pollingInterval);
+                     } else if (backendEvent === 'failed') {
+                         setErrorMsg(data.error_message || 'Analysis failed');
+                         clearInterval(pollingInterval);
+                     }
+                 } catch (err) {
+                     console.error('Polling error:', err);
+                 }
+             }, 2000);
+        };
+
         const connect = () => {
             const socket = createWebSocket(
                 jobId, 
@@ -46,10 +74,8 @@ export const useJobProgress = (jobId: string | null) => {
                     }
                 },
                 () => {
-                    const { status } = useAnalysisStore.getState();
-                    if (status !== 'complete' && status !== 'failed' && reconnectCount.current < maxReconnects) {
-                        reconnectCount.current += 1;
-                    }
+                    console.warn('Socket error in hook — jumping to polling');
+                    startPolling();
                 }
             );
             
@@ -61,6 +87,9 @@ export const useJobProgress = (jobId: string | null) => {
         return () => {
             if (socketRef.current) {
                 socketRef.current.close();
+            }
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
             }
         };
     }, [jobId, updateProgress, setResults]);

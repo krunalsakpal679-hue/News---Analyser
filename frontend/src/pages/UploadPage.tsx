@@ -41,44 +41,6 @@ export const UploadPage: React.FC = () => {
                 <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-white">
                     <DropZone />
                 </div>
-
-                {/* History Section */}
-                {history.length > 0 && (
-                    <div className="space-y-6">
-                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2 px-2">
-                            Recent Analyses
-                            <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                                Past 7 days
-                            </span>
-                        </h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {history.map((item) => (
-                                <Link
-                                    key={item.job_id}
-                                    to={`/${item.job_id}`}
-                                    className="group bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all flex items-center justify-between"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-3 h-3 rounded-full ${item.verdict === 'GOOD' ? 'bg-green-500' :
-                                            item.verdict === 'BAD' ? 'bg-red-500' : 'bg-slate-400'
-                                            }`} />
-                                        <div>
-                                            <h4 className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
-                                                {item.filename}
-                                            </h4>
-                                            <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-                                                <Calendar className="w-3 h-3" />
-                                                {new Date(item.created_at).toLocaleDateString()}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" />
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* Footer */}

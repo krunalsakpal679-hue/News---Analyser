@@ -35,8 +35,9 @@ async def update_progress(job_id, event_name: str, progress: int, extra: dict = 
         payload.update(extra)
         
     try:
-        # Pass the dictionary directly; redis_service will handle serialization
-        await redis_service.publish_progress(job_id_str, payload)
+        # Use pydantic_encoder to ensure non-serializable objects (UUID, datetime) work
+        serialized_payload = json.dumps(payload, default=pydantic_encoder)
+        await redis_service.publish_progress(job_id_str, serialized_payload)
     except Exception as e:
         logger.warning(f"Failed to publish progress for {job_id_str}: {str(e)}")
 
