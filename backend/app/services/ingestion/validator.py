@@ -8,6 +8,7 @@ from app.config import settings
 class FileValidator:
     ALLOWED_MIMES = {
         'application/pdf': 'pdf',
+        'application/x-pdf': 'pdf',
         'image/png': 'image_png',
         'image/jpeg': 'image_jpg'
     }

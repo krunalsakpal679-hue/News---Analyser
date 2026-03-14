@@ -21,18 +21,8 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.code === 'ECONNABORTED') {
-      throw new Error(
-        'Request timed out. OCR processing may take up to 30 seconds.'
-      )
-    }
-    if (error.response?.status === 413) {
-      throw new Error('File too large. Maximum size is 50MB.')
-    }
-    if (error.response?.status === 422) {
-      throw new Error('Invalid file type. Please upload PNG, JPG, or PDF.')
-    }
-    throw error
+    // Just pass the error through for specific components to handle
+    return Promise.reject(error)
   }
 )
 
