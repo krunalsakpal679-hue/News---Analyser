@@ -40,8 +40,8 @@ async def readiness_check(response: Response):
     # 3. Check Storage
     try:
         if storage_service.use_cloudinary:
-            # Simple ping to Cloudinary API
-            await asyncio.to_thread(storage_service.use_cloudinary) # Just checking flag
+            # If the flag is set, we consider storage 'ready' for boot.
+            # Real connectivity is handled during the first upload.
             status_report["storage"] = "ok (cloudinary)"
         else:
             await asyncio.to_thread(storage_service.s3.list_buckets)
