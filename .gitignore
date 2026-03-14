@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Logs — all the backend_*.log files must be excluded
+*.log
+*.log.*
+backend_*.log
+frontend_*.log
+e2e_*.log
+
+# Test databases
+*.db
+*.sqlite
+
+# Environment files
+.env
+.env.local
+backend/.env.local
+
+# Development output files
+alembic_err.txt
+importerr.txt
+mypy.txt
+output.txt
+settings_err.txt
+diagnose.out
+test_output.txt
+diagnose.out
+tsc_errors.txt
+tsc_output.txt
+errors.log
+
+# Debug scripts (keep verify_success, exclude test files)
+debug_*.py
+inspect_model.py
+test_settings.py
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.env.local
+
+# ML Models — too large for GitHub (250MB+)
+ml_models/
+backend/ml_models/
+*.bin
+*.safetensors
+*.ot
+*.onnx
+
+# Docker
+.docker/
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Test files
+sample_news.pdf
+test.pdf
+backend/test.png
+backend/test_with_text.png
+upload_error.json
