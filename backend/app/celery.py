@@ -131,6 +131,9 @@ async def _run_pipeline_orchestrator(self, job_id):
             })
             
             logger.info(f"Pipeline finished for job {actual_uuid}")
+            logger.info(f"Extracted Text Snippet: {extraction['text'][:200]}...")
+            logger.info(f"Final Scores: {final['final_scores']}")
+            logger.info(f"Verdict: {final['verdict']} (Confidence: {final['verdict_confidence']})")
             return {'job_id': str(actual_uuid), 'verdict': final['verdict']}
 
         except Exception as exc:
