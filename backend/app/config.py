@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     # Update ALLOWED_ORIGINS to include Netlify URL
     # Set this in Railway environment variables
     # CORS: List your Netlify URL here (e.g., https://your-site.netlify.app)
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,https://news-analysers.netlify.app"
     
     @property
     def async_database_url(self) -> str:
