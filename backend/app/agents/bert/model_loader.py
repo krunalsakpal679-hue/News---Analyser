@@ -35,7 +35,6 @@ class BERTModelLoader:
             cls._model = hf_pipeline(
                 'sentiment-analysis',
                 model='distilbert-base-uncased-finetuned-sst-2-english',
-                cache_dir=settings.HF_MODEL_DIR,
                 device=-1,
                 truncation=True,
                 max_length=512

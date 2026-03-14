@@ -12,6 +12,7 @@ RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ENV HF_HOME=/app/ml_models
 
 # Copy requirements first for Docker layer caching
 COPY backend/requirements.txt .
