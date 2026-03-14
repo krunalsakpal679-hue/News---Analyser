@@ -8,7 +8,7 @@ from app.config import settings
 
 celery_app = Celery(
     "newsense",
-    broker=settings.CELERY_BROKER_URL,
+    broker=settings.broker_url,
     backend=settings.REDIS_URL
 )
 

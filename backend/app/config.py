@@ -9,7 +9,14 @@ class Settings(BaseSettings):
     """
     DATABASE_URL: str = "sqlite+aiosqlite:///./test.db"
     REDIS_URL: str = "redis://localhost:6379/0"
-    CELERY_BROKER_URL: str = "redis://localhost:6379/0"
+    
+    # Celery - defaults to REDIS_URL if not provided
+    CELERY_BROKER_URL: str | None = None
+    
+    @property
+    def broker_url(self) -> str:
+        """Prefers CELERY_BROKER_URL, falls back to REDIS_URL."""
+        return self.CELERY_BROKER_URL or self.REDIS_URL
     TESSERACT_CMD: str = '/usr/bin/tesseract'
     HF_MODEL_DIR: str = './ml_models'
     MAX_FILE_SIZE_MB: int = 50
