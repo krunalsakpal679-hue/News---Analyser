@@ -1,10 +1,11 @@
 import axios from 'axios'
+import config from '../config'
 
-const BASE_URL = import.meta.env.VITE_API_URL || ''
+const BASE_URL = config.apiUrl
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 60000,  // 60s timeout for OCR processing
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -41,13 +42,7 @@ export function createWebSocket(
   onMessage: (data: any) => void,
   onError?: () => void
 ): WebSocket {
-  // Connect directly to Railway URL for WebSocket
-  // Netlify cannot proxy WebSocket connections
-  const apiBase = import.meta.env.VITE_API_URL || 'https://news-analyser-production.up.railway.app'
-  const wsBase = apiBase
-    .replace('https://', 'wss://')
-    .replace('http://', 'ws://')
-  
+  const wsBase = config.wsUrl
   const ws = new WebSocket(`${wsBase}/api/v1/ws/${jobId}`)
   
   ws.onmessage = (e) => {

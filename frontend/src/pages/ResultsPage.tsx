@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getResults, apiClient } from '../api/client';
+import config from '../config';
 import { useAnalysisStore } from '../store/analysisStore';
 import { VerdictBadge } from '../components/results/VerdictBadge';
 import { SentimentCharts } from '../components/results/SentimentCharts';
@@ -106,7 +107,7 @@ export const ResultsPage: React.FC = () => {
     
     const showRetry = (results.word_count || 0) < 10 || (results.ocr_confidence || 0) < 0.5;
 
-    const API_BASE = import.meta.env.VITE_API_URL || '';
+    const API_BASE = config.apiUrl;
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 md:px-8">
