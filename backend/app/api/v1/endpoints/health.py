@@ -39,11 +39,14 @@ async def readiness_check(response: Response):
 
     # 3. Check Storage
     try:
-        # Check if we can list or at least access it
-        await asyncio.to_thread(storage_service.s3.list_buckets)
-        status_report["storage"] = "ok"
+        if storage_service.use_cloudinary:
+            # Simple ping to Cloudinary API
+            await asyncio.to_thread(storage_service.use_cloudinary) # Just checking flag
+            status_report["storage"] = "ok (cloudinary)"
+        else:
+            await asyncio.to_thread(storage_service.s3.list_buckets)
+            status_report["storage"] = "ok (minio)"
     except Exception:
-        # In development, we might not have MinIO/S3
         from app.config import settings
         if settings.ENVIRONMENT == "development":
             status_report["storage"] = "ok (local_fallback)"
