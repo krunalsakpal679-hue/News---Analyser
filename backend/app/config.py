@@ -38,6 +38,17 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
     
     @property
+    def async_database_url(self) -> str:
+        """Converts postgresql:// to postgresql+asyncpg:// for SQLAlchemy async."""
+        url = self.DATABASE_URL
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            # Railway sometimes provides postgres://
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        return url
+
+    @property
     def origins_list(self) -> list:
         return [o.strip() for o in self.ALLOWED_ORIGINS.split(",")]
 

@@ -18,7 +18,7 @@ target_metadata = Base.metadata
 config = context.config
 
 # Override sqlalchemy.url with the environment URL
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", settings.async_database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

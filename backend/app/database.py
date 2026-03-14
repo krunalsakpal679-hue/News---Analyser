@@ -19,7 +19,7 @@ def get_engine():
     
     if loop_id not in _ENGINE_CACHE:
         _ENGINE_CACHE[loop_id] = create_async_engine(
-            settings.DATABASE_URL,
+            settings.async_database_url,
             echo=True if settings.ENVIRONMENT == "development" else False,
             pool_pre_ping=True
         )
