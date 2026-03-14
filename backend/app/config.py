@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     # Environment detection
     ENVIRONMENT: str = "development"  # "development" | "production"
     
-    CELERY_TASK_ALWAYS_EAGER: bool = False
+    CELERY_TASK_ALWAYS_EAGER: bool = True
 
     # Cloudinary (for Railway/production file storage)
     CLOUDINARY_CLOUD_NAME: str = ""
