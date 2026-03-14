@@ -76,10 +76,11 @@ async def job_progress_ws(websocket: WebSocket, job_id: str):
             if settings.ENVIRONMENT == "development":
                 logger.warning(f"Redis sub failed, falling back to DB polling: {str(subscribe_err)}")
                 last_status = job.status if job else None
+                last_progress = job.progress_pct if job else 0
                 while True:
                     async with AsyncSessionLocal() as sess:
                         j = await job_service.get_job(sess, target_id)
-                        if j and j.status != last_status:
+                        if j and (j.status != last_status or j.progress_pct != last_progress):
                             ev = {
                                 "event": j.status,
                                 "progress": j.progress_pct,
@@ -91,11 +92,12 @@ async def job_progress_ws(websocket: WebSocket, job_id: str):
                             
                             await websocket.send_json(ev)
                             last_status = j.status
+                            last_progress = j.progress_pct
                             
                             if j.status in ("complete", "failed"):
                                 await asyncio.sleep(1.0)
                                 break
-                    await asyncio.sleep(1.0)
+                    await asyncio.sleep(0.5)
             else:
                 raise
 
